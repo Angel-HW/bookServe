@@ -1,50 +1,36 @@
 <template>
   <div id="c-table">
-    <div class="table-box">
-      <div class="table-operate">
-        <el-button
-          type="primary"
-          v-for="(item,key) in btnList"
-          :key="key"
-          @click="item.clickName"
-          >
-          {{ item.ope_name }}
-        </el-button>
-
-        <div class="search" v-if="showInput">
-          <el-input
-            placeholder="输入货品关键字进行搜索"
-            v-model="inputValue"
-          >
-          </el-input>
-          <i class="el-icon-search"></i>
-        </div>
-      </div>
-      <el-table
-        :data="dialog_tableData"
+    <el-table
+      :ref="refs"
+      :data="CTableData"
+      @selection-change="handleSelectionChange"
+    >
+      <el-table-column
+        type="selection"
+        width="55"
+        v-if="showSelection">
+      </el-table-column>
+      <el-table-column
+        label="操作"
+        v-if="showTableOperateBtn"
       >
-        <el-table-column
-          label="操作"
-          v-if="showOperateBtn"
-        >
-          <template>
-            <el-button type="primary" icon="el-icon-edit" circle></el-button>
-            <el-button type="danger" icon="el-icon-delete" circle></el-button>
-          </template>
-        </el-table-column>
-        <el-table-column
-          type="selection"
-          width="55"
-          v-if="showSelection">
-        </el-table-column>
-        <el-table-column
-          v-for="(item,key) in dialog_tableHeader"
-          :key="key"
-          :prop="item.prop"
-          :label="item.label"
-        ></el-table-column>
-      </el-table>
-    </div>
+        <template>
+          <el-button type="primary" icon="el-icon-edit" circle></el-button>
+          <el-button type="danger" icon="el-icon-delete" circle></el-button>
+        </template>
+      </el-table-column>
+      <slot></slot>
+    </el-table>
+    <el-pagination
+    v-show="show_pagination"
+    @size-change="sizeChange"
+    @current-change="handleCurrentChange"
+    :current-page="pageInfo.currentPage"
+    :page-sizes="[1, 2, 3, 12]"
+    :page-size="pageInfo.pageSize"
+    layout="total, sizes, prev, pager, next, jumper"
+    :total="pageInfo.total">
+  </el-pagination>
   </div>
 </template>
 
@@ -52,37 +38,41 @@
 export default {
   name: 'CTable',
   props: {
+    refs: {
+      type: String,
+      default: () => {
+        return ''
+      }
+    },
+    pageInfo: {
+      type: Object,
+      default: () => {
+        return {
+          pageSize: 1,
+          currentPage: 1,
+          total: 0
+        }
+      }
+    },
+    show_pagination: {
+      type: Boolean,
+      default: () => {
+        return true
+      }
+    },
     showSelection: {
       type: Boolean,
       default: () => {
         return false
       }
     },
-    showInput: {
+    showTableOperateBtn: {
       type: Boolean,
       default: () => {
         return false
       }
     },
-    showOperateBtn: {
-      type: Boolean,
-      default: () => {
-        return false
-      }
-    },
-    btnList: {
-      type: Array,
-      default: () => {
-        return []
-      }
-    },
-    dialog_tableData: {
-      type: Array,
-      default: () => {
-        return []
-      }
-    },
-    dialog_tableHeader: {
+    CTableData: {
       type: Array,
       default: () => {
         return []
@@ -95,15 +85,16 @@ export default {
     }
   },
   methods: {
-    buttonDialog () {
-      console.log('buttonDialog')
-      this.$emit('buttonDialog')
+    // 修改当前页
+    handleCurrentChange (value) {
+      this.$emit('handleCurrentChange', value)
     },
-    showVdiolagy (value) {
-      console.log(value)
+    // 修改每页数量
+    sizeChange (value) {
+      this.$emit('sizeChange', value)
     },
-    deleteData (value) {
-      console.log(value)
+    handleSelectionChange (row) {
+      this.$emit('selection-change', row)
     }
   }
 }
@@ -111,24 +102,9 @@ export default {
 
 <style lang="scss">
 #c-table {
-  .table-box {
-    .table-operate {
-      display: flex;
-      justify-content: space-between;
-      .search {
-        width: 30%;
-        display: flex;
-        align-items: center;
-        position: relative;
-        .el-input {
-          width: 100%;
-        }
-        i {
-          position: absolute;
-          right: 10px;
-        }
-      }
-    }
+  .el-pagination {
+    background-color: #fff;
+    text-align: right;
   }
 }
 </style>

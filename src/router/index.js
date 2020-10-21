@@ -4,12 +4,24 @@ import VueRouter from 'vue-router'
 Vue.use(VueRouter)
 
 const routes = [
+  // 登录
   {
     path: '/',
+    name: 'login',
+    component: () => import(/* webpackChunkName: "login" */ '../pages/login/login.vue')
+  },
+  // 注册
+  {
+    path: '/register',
+    name: 'register',
+    component: () => import(/* webpackChunkName: "register" */ '../pages/register/register.vue')
+  },
+  {
+    path: '/home',
     name: 'Home',
     component: () => import(/* webpackChunkName: "home" */ '../pages/home.vue'),
     children: [
-      // 管理人员管理
+      // 人员管理
       {
         path: '/adminInfo',
         name: 'adminInfo',
@@ -30,37 +42,47 @@ const routes = [
         name: 'bookSearch',
         component: () => import(/* webpackChunkName: "bookSearch" */ '../pages/bookSearch/bookSearch.vue')
       },
-      // 图书出入库
+      // 图书出库
       {
-        path: '/bookInOut',
-        name: 'bookInOut',
-        component: () => import(/* webpackChunkName: "bookInOut" */ '../pages/bookInAndOut/bookInAndOut.vue')
+        path: '/bookIn',
+        name: 'bookIn',
+        component: () => import(/* webpackChunkName: "bookIn" */ '../pages/bookInAndOut/bookIn.vue')
       },
-      // 借还图书
+      // 图书出库
       {
-        path: '/bookBorAndRet',
-        name: 'bookBorAndRet',
-        component: () => import(/* webpackChunkName: "bookBorAndRet" */ '../pages/bookBorAndRet/book-borrow-return.vue')
+        path: '/bookOut',
+        name: 'bookOut',
+        component: () => import(/* webpackChunkName: "bookOut" */ '../pages/bookInAndOut/bookOut.vue')
       },
-      // 图书借还查询
+      // 图书借阅
+      {
+        path: '/bookBorrow',
+        name: 'bookBorrow',
+        component: () => import(/* webpackChunkName: "bookBorrow" */ '../pages/bookBorAndRet/bookBorrow.vue')
+      },
+      // 图书归还
+      {
+        path: '/bookReturn',
+        name: 'bookReturn',
+        component: () => import(/* webpackChunkName: "bookReturn" */ '../pages/bookBorAndRet/bookReturn.vue')
+      },
+      // 图书借阅查询
       {
         path: '/bookBRSearch',
         name: 'bookBRSearch',
         component: () => import(/* webpackChunkName: "bookBRSearch" */ '../pages/bookBRSearch/bookBRSearch.vue')
       },
-      // 用户信息
+      // 测试
       {
-        path: '/adminInfo',
-        name: 'adminInfo',
-        component: () => import(/* webpackChunkName: "adminInfo" */ '../pages/adminInfo/admin-info.vue')
+        path: '/test',
+        name: 'test',
+        component: () => import(/* webpackChunkName: "test" */ '../pages/test.vue')
       }
     ]
   }
 ]
 
 const router = new VueRouter({
-  mode: 'history',
-  base: process.env.BASE_URL,
   routes
 })
 

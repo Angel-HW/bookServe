@@ -1,0 +1,40 @@
+#book-BR-search {
+  position: relative;
+  .operation-box {
+    display: flex;
+    #upload-excel {
+      margin-right: 10px;
+    }
+    #c-operaion {
+      display: flex;
+      justify-content: flex-start;
+      flex: 1;
+    }
+  }
+  .confirm-dialog {
+    position: fixed;
+    left: 200px;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 10;
+    .table-box {
+      padding: 0 20px;
+      box-sizing: border-box;
+      position: absolute;
+      // width: 70%;
+      left: 50%;
+      top: 50%;
+      transform: translate(-100%, -50%);
+      background-color: #fff;
+      .title {
+        text-align: center;
+      }
+      .btnList {
+        margin: 10px 0;
+        text-align: center;
+      }
+    }
+  }
+}

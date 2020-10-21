@@ -7,25 +7,22 @@
         </div>
         <!-- 管理员菜单 -->
         <div class="menu">
-          <el-menu router>
+          <el-menu router :default-active="defaultUrl">
             <el-submenu index="1">
               <template slot="title"><i class="el-icon-reading"></i>图书管理</template>
               <el-menu-item-group>
                 <template slot="title">子菜单</template>
                 <el-menu-item index="/bookPurchar">图书采购</el-menu-item>
-                <el-menu-item index="/bookInOut">图书出入库</el-menu-item>
+                <el-menu-item index="/bookIn">图书入库</el-menu-item>
+                <el-menu-item index="/bookOut">图书出库</el-menu-item>
                 <el-menu-item index="/bookSearch">图书查询</el-menu-item>
+                <el-menu-item index="/bookBorrow">图书借阅</el-menu-item>
+                <el-menu-item index="/bookReturn">图书归还</el-menu-item>
+                <el-menu-item index="/bookBRSearch">借阅图书查询</el-menu-item>
+                <el-menu-item index="/test">测试</el-menu-item>
               </el-menu-item-group>
             </el-submenu>
             <el-submenu index="2">
-              <template slot="title"><i class="el-icon-s-order"></i>借还管理</template>
-              <el-menu-item-group>
-                <template slot="title">子菜单</template>
-                <el-menu-item index="/bookBorAndRet">借还图书</el-menu-item>
-                <el-menu-item index="/bookBRSearch">借还图书查询</el-menu-item>
-              </el-menu-item-group>
-            </el-submenu>
-            <el-submenu index="3">
               <template slot="title"><i class="el-icon-user-solid"></i>用户管理</template>
               <el-menu-item-group>
                 <template slot="title">子菜单</template>
@@ -38,6 +35,14 @@
 
       <el-container class="second-container">
         <el-header>
+          <el-dropdown>
+            <i class="el-icon-setting" style="margin-right: 15px"></i>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item @click.native="loginOut">退出</el-dropdown-item>
+              <!-- <el-dropdown-item>新增</el-dropdown-item>
+              <el-dropdown-item>删除</el-dropdown-item> -->
+            </el-dropdown-menu>
+          </el-dropdown>
           <span>管理员</span>
         </el-header>
         <el-main>
@@ -53,6 +58,19 @@ export default {
   name: 'home',
   data () {
     return {
+      defaultUrl: ''
+    }
+  },
+  methods: {
+    loginOut () {
+      try {
+        this.$api.logout()
+        sessionStorage.clear('roleInfo')
+        this.$router.push('/')
+        this.$message.success('退出成功')
+      } catch {
+        this.$message.error('操作失败')
+      }
     }
   },
   computed: {
@@ -60,6 +78,10 @@ export default {
       // return JSON.parse(sessionStorage.getItem('roleInfo')).role
       return '1'
     }
+  },
+  mounted () {
+    const href = window.location.href
+    this.defaultUrl = href.split('/#')[1]
   }
 }
 </script>
@@ -68,10 +90,10 @@ export default {
 #home {
   .first-container {
     height: 100vh;
-    border: 1px solid #eee;
+    // border: 1px solid #eee;
     .el-aside {
       color: white;
-      background-color: rgb(46, 62, 82);
+      background-color: rgb(42, 58, 76);
       .logo {
         width: 200px;
         height: 60px;
@@ -84,22 +106,29 @@ export default {
       }
       .menu {
         .el-menu {
-          background-color: rgb(46, 62, 82);
+          background-color: rgb(42, 58, 76);
+          border-right: solid 1px #000000;
           .el-submenu {
             border-top: 1px solid #dddddd;
             .el-submenu__title {
               color: white;
             }
             .el-submenu__title:hover {
-              color: black;
+              background-color: rgb(0, 21, 40)!important;
             }
             .el-menu-item-group {
-              background-color: rgb(0, 21, 40);
+              background-color: rgb(31, 45, 61);
               .el-menu-item {
                 color: white;
               }
+              .el-menu-item.is-active {
+                color: #1890ff!important;
+              }
               .el-menu-item:hover {
-                color: black;
+                background-color: rgb(0, 21, 40)!important;
+              }
+              .el-menu-item:focus {
+                background-color: rgb(0, 21, 40)!important;
               }
             }
           }
