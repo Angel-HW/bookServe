@@ -12,7 +12,7 @@
     </div>
     <slot></slot>
     <div class="search">
-      <el-select v-model="value" placeholder="请选择">
+      <el-select v-model="keyWord" placeholder="请选择">
         <el-option
           v-for="item in searchOptions"
           :key="item.value"
@@ -25,7 +25,7 @@
         v-model="inputValue"
       >
       </el-input>
-      <i class="el-icon-search"></i>
+      <i class="el-icon-search" @click="keyWordSearch"></i>
     </div>
   </div>
 </template>
@@ -49,7 +49,12 @@ export default {
   data () {
     return {
       inputValue: '',
-      value: ''
+      keyWord: ''
+    }
+  },
+  methods: {
+    keyWordSearch () {
+      this.$emit('keyWordSearch', this.keyWord, this.inputValue)
     }
   }
 }

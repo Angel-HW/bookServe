@@ -5,9 +5,9 @@
         <div class="logo">
           <h1>第三组</h1>
         </div>
-        <!-- 管理员菜单 -->
         <div class="menu">
-          <el-menu router :default-active="defaultUrl">
+        <!-- 管理员菜单 -->
+          <el-menu router :default-active="$route.path" v-show="userInfo.userRole === '1'">
             <el-submenu index="1">
               <template slot="title"><i class="el-icon-reading"></i>图书管理</template>
               <el-menu-item-group>
@@ -20,6 +20,26 @@
                 <el-menu-item index="/bookReturn">图书归还</el-menu-item>
                 <el-menu-item index="/bookBRSearch">借阅图书查询</el-menu-item>
                 <el-menu-item index="/test">测试</el-menu-item>
+              </el-menu-item-group>
+            </el-submenu>
+            <el-submenu index="2">
+              <template slot="title"><i class="el-icon-user-solid"></i>用户管理</template>
+              <el-menu-item-group>
+                <template slot="title">子菜单</template>
+                <el-menu-item index="/adminInfo">用户信息</el-menu-item>
+              </el-menu-item-group>
+            </el-submenu>
+          </el-menu>
+          <!-- 客户菜单 -->
+          <el-menu router :default-active="$route.path" v-show="userInfo.userRole === '2'">
+            <el-submenu index="1">
+              <template slot="title"><i class="el-icon-reading"></i>图书管理</template>
+              <el-menu-item-group>
+                <template slot="title">子菜单</template>
+                <el-menu-item index="/bookSearch">图书查询</el-menu-item>
+                <el-menu-item index="/bookBorrow">图书借阅</el-menu-item>
+                <el-menu-item index="/bookReturn">图书归还</el-menu-item>
+                <el-menu-item index="/bookBRSearch">借阅图书查询</el-menu-item>
               </el-menu-item-group>
             </el-submenu>
             <el-submenu index="2">
@@ -43,7 +63,8 @@
               <el-dropdown-item>删除</el-dropdown-item> -->
             </el-dropdown-menu>
           </el-dropdown>
-          <span>管理员</span>
+          <!-- <span>{{ userInfo }}</span> -->
+          <span>{{ userInfo.userName }}</span>
         </el-header>
         <el-main>
           <router-view/>
@@ -74,9 +95,8 @@ export default {
     }
   },
   computed: {
-    userType () {
-      // return JSON.parse(sessionStorage.getItem('roleInfo')).role
-      return '1'
+    userInfo () {
+      return JSON.parse(sessionStorage.getItem('roleInfo'))
     }
   },
   mounted () {

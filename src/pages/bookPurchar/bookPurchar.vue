@@ -14,6 +14,7 @@
       :showSelection="true"
       :showTableOperateBtn="true"
       :CTableData="tableData"
+      @selection-change="handleSelectionChange"
     >
       <el-table-column
         v-for="(item,key) in tableHeader"
@@ -32,6 +33,7 @@
 import CTable from '../../components/c-table'
 import cUploadExcel from '../../components/c-uploadExcel'
 import COperation from '../../components/c-operaion'
+// import { delete } from 'vue/types/umd'
 
 export default {
   components: {
@@ -39,9 +41,11 @@ export default {
     'c-upload-excel': cUploadExcel,
     'c-operation': COperation
   },
+  inject: ['reload'],
   data () {
     return {
       num: '',
+      selectedRow: [],
       searchOptions: [
         {
           value: '选项1',
@@ -63,21 +67,14 @@ export default {
           ope_name: '确认购买',
           func: () => {
             console.log('确认购买')
+            this.comfirmtoBuy()
           }
         }
       ],
       tableHeader: [
         {
-          prop: 'id',
-          label: '编号'
-        },
-        {
           prop: 'bookName',
           label: '书名'
-        },
-        {
-          prop: 'createTime',
-          label: '采购时间'
         },
         {
           prop: 'num',
@@ -86,6 +83,10 @@ export default {
         {
           prop: 'price',
           label: '价格'
+        },
+        {
+          prop: 'bookInType',
+          label: '采购类型'
         }
       ],
       tableData: [
@@ -96,11 +97,52 @@ export default {
     }
   },
   methods: {
+    // 确认购买
+    async comfirmtoBuy () {
+      const bookName = this.selectedRow.map(item => {
+        return item.bookName
+      }).toString()
+      const num = this.selectedRow.map(item => {
+        return item.num
+      }).toString()
+      const price = this.selectedRow.map(item => {
+        return item.price
+      }).toString()
+      const bookInType = this.selectedRow.map(item => {
+        return item.bookInType
+      }).toString()
+      try {
+        await this.$api.bookPurchar.addcg({
+          bookName: bookName,
+          num: num,
+          price: price,
+          bookInType: bookInType
+        }).then(res => {
+          console.log(res)
+          this.$router.push('/bookIn')
+          this.$message.success(res.msg)
+        })
+      } catch {
+        this.$message.error('数据获取失败')
+      }
+    },
     getExcelData (tableHeader, tableData) {
-      this.tableHeader = tableHeader
-      this.tableData = tableData
-      console.log(this.tableHeader)
-      console.log(this.tableData)
+      this.tableData = tableData.map(item => {
+        item.bookName = item['书名']
+        item.num = item['采购数量']
+        item.price = item['价格']
+        item.bookInType = item['采购类型']
+        delete item['书名']
+        delete item['采购数量']
+        delete item['价格']
+        delete item['采购类型']
+        return item
+      })
+    },
+    handleSelectionChange (row) {
+      // console.log(row)
+      this.selectedRow = row
+      console.log(this.selectedRow)
     }
   }
 }

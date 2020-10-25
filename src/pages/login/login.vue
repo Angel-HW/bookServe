@@ -57,7 +57,7 @@ export default {
     // 获取验证码
     async getIdenfyCode () {
       try {
-        await this.$api.getImage()
+        await this.$api.login.getImage()
         // this.identifyCode = 'http://3091m9d958.zicp.vip/user/getImage'
         this.updateIdenfyCode()
         // console.log(res)
@@ -68,12 +68,12 @@ export default {
     async login () {
       // this.$router.push('/home')
       try {
-        await this.$api.login({
+        await this.$api.login.login({
           ...this.form
         }).then(res => {
           if (res.code >= 200 && res.code < 300) {
-            sessionStorage.setItem('roleInfo', JSON.stringify(res))
-            sessionStorage.setItem('key_token', JSON.stringify(res.data))
+            sessionStorage.setItem('roleInfo', JSON.stringify(res.data))
+            sessionStorage.setItem('key_token', JSON.stringify(res.data.authorization))
             // this.$store.commit('set_token', res.data);
             this.$message.success(res.msg)
             this.$router.push('/home')

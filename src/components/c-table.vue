@@ -12,11 +12,12 @@
       </el-table-column>
       <el-table-column
         label="操作"
+        width="100px"
         v-if="showTableOperateBtn"
       >
-        <template>
-          <el-button type="primary" icon="el-icon-edit" circle></el-button>
-          <el-button type="danger" icon="el-icon-delete" circle></el-button>
+        <template slot-scope="scope">
+          <el-button type="primary" icon="el-icon-edit" circle @click="editData(scope.$index)"></el-button>
+          <!-- <el-button type="danger" icon="el-icon-delete" circle></el-button> -->
         </template>
       </el-table-column>
       <slot></slot>
@@ -85,6 +86,10 @@ export default {
     }
   },
   methods: {
+    editData (row) {
+      console.log(row)
+      this.$emit('editData', row)
+    },
     // 修改当前页
     handleCurrentChange (value) {
       this.$emit('handleCurrentChange', value)

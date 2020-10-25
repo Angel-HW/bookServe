@@ -4,15 +4,20 @@
       <c-operation
         :tableBtnList="tableBtnList"
         :searchOptions="searchOptions"
+        @keyWordSearch="keyWordSearch"
       >
       </c-operation>
     </div>
     <c-table
       :ref="tableRefs"
       :showSelection="true"
-      :showTableOperateBtn="false"
+      :showTableOperateBtn="true"
       :CTableData="tableData"
+      :pageInfo="pageInfo"
+      @sizeChange="sizeChange"
+      @handleCurrentChange="handleCurrentChange"
       @selection-change="handleSelectionChange"
+      @editData="beforeEditBookInfo"
     >
       <!-- show-overflow-tooltip:自动隐藏过多内容 -->
       <el-table-column
@@ -25,45 +30,56 @@
       ></el-table-column>
     </c-table>
      <!--确认借阅弹窗  -->
-    <c-dialog v-model="dialogVisible"
+    <c-dialog
+      v-model="dialogVisible"
       :title="dialogTitle"
       @dialog-before-close="dialogBeforeClose"
       @dialog-cancel="dialogCancel"
       @dialog-confirm="dialogConfirm">
-        <el-form :model="dialogTableData" ref="form" :rules="formRules" label-width="100px">
-          <el-row>
-            <el-col :span="12" >
-              <el-form-item label="书籍编号" prop="id">
-                <el-input v-model="dialogTableData.id"></el-input>
+      <el-form :model="dialogTableData" ref="form" label-width="100px">
+        <el-row>
+          <el-col :span="12" >
+            <el-form-item v-show="false" label="书籍编号" prop="id">
+              <el-input v-model="dialogTableData.id"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+              <el-form-item label="书籍名称" prop="bookName">
+                <el-input :disabled="true" v-model="dialogTableData.bookName"></el-input>
+              </el-form-item>
+          </el-col>
+            <el-col :span="12">
+              <el-form-item label="书籍作者" prop="bookAuthor">
+                <el-input v-model.number="dialogTableData.bookAuthor"></el-input>
               </el-form-item>
             </el-col>
-        <el-col :span="12">
-            <el-form-item label="书籍名称" prop="bookName">
-              <el-input v-model="dialogTableData.bookName"></el-input>
-            </el-form-item>
-        </el-col>
           <el-col :span="12">
-            <el-form-item label="书籍作者" prop="author">
-              <el-input v-model.number="dialogTableData.author"></el-input>
+            <el-form-item label="书籍出版社" prop="bookPress">
+              <el-input v-model="dialogTableData.bookPress"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="书籍出版社" prop="chubanshe">
-              <el-input v-model="dialogTableData.chubanshe"></el-input>
+            <el-form-item label="内容简介" prop="detail">
+              <el-input v-model="dialogTableData.detail"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="内容简介" prop="buyCounts">
-              <el-input v-model="dialogTableData.buyCounts"></el-input>
+            <el-form-item label="存放地点" prop="bookPlace">
+              <el-input v-model="dialogTableData.bookPlace"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="书籍库存量" prop="allCounts">
-              <el-input v-model="dialogTableData.allCounts"></el-input>
+            <el-form-item label="书籍库存量" prop="num">
+              <el-input v-model="dialogTableData.num"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="单价" prop="price">
+              <el-input v-model="dialogTableData.price"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
-       </el-form>
+      </el-form>
     </c-dialog>
   </div>
 </template>
@@ -81,51 +97,39 @@ export default {
     'c-operation': COperation,
     'c-dialog': CDialog
   },
+  inject: ['reload'],
   data () {
     return {
       dialogVisible: false,
       dialogTitle: '修改书籍信息',
       tableRefs: 'multipleTable',
       num: '',
+      pageInfo: {
+        pageSize: 1,
+        currentPage: 1,
+        total: 0
+      },
       searchOptions: [
         {
-          value: '选项1',
+          value: 'bookName',
           label: '书籍名称'
         },
         {
-          value: '选项2',
+          value: 'bookAuthor',
           label: '作者'
         },
         {
-          value: '选项3',
+          value: 'bookPress',
           label: '出版社'
         }
       ],
       tableBtnList: [
         {
           type: 'primary',
-          btnkName: 'comfirm',
-          ope_name: '修改',
+          ope_name: '清除查询条件',
           func: () => {
-            console.log('修改')
-            console.log(this.dialogTableData)
-            this.dialogVisible = true
-            // if (this.dialogTableData.length === 0) {
-            //   this.$message.info('请选择需要修改的图书')
-            // } else {
-            //   const myDate = new Date()
-            //   const years = myDate.getFullYear()
-            //   const month = myDate.getMonth() + 1
-            //   const day = myDate.getDate()
-            //   this.dialogTableData = this.dialogTableData.map(item => {
-            //     item.startDate = `${years}-${month}-${day}`
-            //     item.endDate = `${years}-${month + 1}-${day}`
-            //     return item
-            //   })
-            //   console.log(this.dialogTableData)
-            //   console.log(myDate)
-            //   this.dialogVisible = true
-            // }
+            this.reload()
+            // this.getInckBook()
           }
         }
       ],
@@ -133,7 +137,7 @@ export default {
         {
           prop: 'id',
           label: '编号',
-          width: '100px'
+          width: '150px'
         },
         {
           prop: 'bookName',
@@ -141,30 +145,34 @@ export default {
           width: '150px'
         },
         {
-          prop: 'author',
+          prop: 'bookAuthor',
           label: '作者',
-          width: '100px'
+          width: '150px'
         },
         {
-          prop: 'chubanshe',
+          prop: 'bookPress',
           label: '书籍出版社',
           width: '200px'
         },
         {
-          prop: 'buyCounts',
-          label: '内容简介'
+          prop: 'detail',
+          label: '内容简介',
+          width: '450px'
         },
         {
-          prop: 'allCounts',
-          label: '在库数量',
-          width: '200px'
+          prop: 'num',
+          label: '在库数量'
+        },
+        {
+          prop: 'price',
+          label: '单价'
         }
       ],
       tableData: [
-        { id: '1', bookName: '平凡的世界', author: 'xxx', chubanshe: '2020-9-28', buyCounts: '如果人生的很多事，很多的境遇，很多的人，都还如初见时的模样，那该有多好呀!若只是初见，一切美好都不会遗失。很多时候，初见，惊艳;蓦然回首，却已物是人非，沧海桑', allCounts: '105' },
-        { id: '1', bookName: '平凡的世界', author: 'xxx', chubanshe: '2020-9-28', buyCounts: '54', allCounts: '105' },
-        { id: '1', bookName: '平凡的世界', author: 'xxx', chubanshe: '2020-9-28', buyCounts: '54', allCounts: '105' },
-        { id: '1', bookName: '平凡的世界', author: 'xxx', chubanshe: '2020-9-28', buyCounts: '54', allCounts: '105' }
+        // { id: '1', bookName: '平凡的世界', author: 'xxx', chubanshe: '2020-9-28', buyCounts: '如果人生的很多事，很多的境遇，很多的人，都还如初见时的模样，那该有多好呀!若只是初见，一切美好都不会遗失。很多时候，初见，惊艳;蓦然回首，却已物是人非，沧海桑', allCounts: '105' },
+        // { id: '1', bookName: '平凡的世界', author: 'xxx', chubanshe: '2020-9-28', buyCounts: '54', allCounts: '105' },
+        // { id: '1', bookName: '平凡的世界', author: 'xxx', chubanshe: '2020-9-28', buyCounts: '54', allCounts: '105' },
+        // { id: '1', bookName: '平凡的世界', author: 'xxx', chubanshe: '2020-9-28', buyCounts: '54', allCounts: '105' }
       ],
       // dialogTableHeader: [
       //   {
@@ -205,6 +213,74 @@ export default {
     }
   },
   methods: {
+    // 查询已入库的图书
+    async getInckBook () {
+      try {
+        await this.$api.bookSearch.getInck({
+          pageNum: this.pageInfo.currentPage,
+          pageSize: this.pageInfo.pageSize
+        }).then(res => {
+          console.log(res)
+          this.tableData = res.data.list
+          this.pageInfo.total = res.data.total
+          // this.$message.success(res.msg)
+        })
+      } catch {
+        this.$message.error('数据获取失败')
+      }
+    },
+    // 编辑图书信息
+    beforeEditBookInfo (row) {
+      console.log(row)
+      this.dialogTitle = '编辑图书'
+      this.dialogTableData = this.tableData[row]
+      this.dialogVisible = true
+    },
+    dialogConfirm () {
+      this.editBookInfo()
+      this.dialogVisible = false
+      // this.$refs.form.resetFields()
+    },
+    async editBookInfo () {
+      console.log(this.dialogTableData)
+      try {
+        await this.$api.bookSearch.editBookInfo({
+          ...this.dialogTableData
+        }).then(res => {
+          console.log(res)
+          this.$message.success(res.msg)
+        })
+      } catch {
+        this.$message.error('数据获取失败')
+      }
+    },
+    // 模糊搜索
+    async keyWordSearch (keyWord, inputValue) {
+      // console.log(keyWord, inputValue)
+      // const searchData = JSON.stringify({ [keyWord]: inputValue })
+      // console.log(searchData)
+      try {
+        await this.$api.bookSearch.getInck({
+          [keyWord]: inputValue,
+          pageNum: 1,
+          pageSize: this.pageInfo.pageSize
+        }).then(res => {
+          console.log(res)
+          console.log(res.data)
+          if (res.data === null) {
+            this.pageInfo.total = 0
+            this.tableData = []
+            this.$message.info(res.msg)
+          } else {
+            this.tableData = res.data.list
+            this.pageInfo.total = res.data.total
+            this.$message.success(res.msg)
+          }
+        })
+      } catch {
+        this.$message.error('数据获取失败')
+      }
+    },
     getExcelData (tableHeader, tableData) {
       this.tableHeader = tableHeader
       this.tableData = tableData
@@ -217,20 +293,28 @@ export default {
       console.log(row)
       this.dialogTableData = row
     },
+    sizeChange (pageSize) {
+      this.pageInfo.pageSize = pageSize
+      this.pageInfo.currentPage = 1
+      this.getInckBook()
+    },
+    handleCurrentChange (pageNum) {
+      this.pageInfo.currentPage = pageNum
+      this.getInckBook()
+    },
     // 关闭弹窗
     dialogCancel () {
       this.dialogVisible = false
       this.$refs.form.resetFields()
       // this.$refs.upload.clearFiles()
     },
-    dialogConfirm () {
-      this.dialogVisible = false
-      this.$refs.form.resetFields()
-    },
     dialogBeforeClose () {
       this.dialogVisible = false
       this.$refs.form.resetFields()
     }
+  },
+  mounted () {
+    this.getInckBook()
   }
 }
 </script>

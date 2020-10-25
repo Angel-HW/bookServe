@@ -122,10 +122,11 @@ export default {
                 })
             }
             outdata = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]) // outdata就是你想要的东西
-            // console.log('未处理的原始数据如下：')
-            // console.log(outdata)
+            console.log('未处理的原始数据如下：')
+            console.log(outdata)
             _this.outData = outdata
             _this.changeTableData()
+            // _this.outDatatotset()
             return outdata
           };
           reader.readAsArrayBuffer(f);

@@ -84,7 +84,7 @@
             label="角色"
             prop="role"
           >
-            <el-select :disabled="true" v-model="form.role" placeholder="请选择">
+            <el-select :disabled="showDetail" v-model="form.role" placeholder="请选择">
               <el-option
                 v-for="item in roleOptions"
                 :key="item.value"
@@ -209,6 +209,14 @@ export default {
               })
             })
           }
+        },
+        {
+          type: 'primary',
+          ope_name: '清除查询条件',
+          func: () => {
+            this.reload()
+            // this.getInckBook()
+          }
         }
       ],
       genderOptions: [
@@ -216,7 +224,6 @@ export default {
         { label: '女', value: '1' }
       ],
       roleOptions: [
-        { label: '超级管理员', value: '0' },
         { label: '管理员', value: '1' },
         { label: '用户', value: '2' }
       ],
@@ -296,7 +303,7 @@ export default {
     // 获取用户列表
     async getUserList () {
       try {
-        await this.$api.userList({
+        await this.$api.adminInfo.userList({
           pageNum: this.pageInfo.currentPage,
           pageSize: this.pageInfo.pageSize
         }).then(res => {
@@ -311,7 +318,7 @@ export default {
     // 获取用户详情
     async getUserData () {
       try {
-        await this.$api.getUserDetail({
+        await this.$api.adminInfo.getUserDetail({
           user_id: this.selectedRow[0].userID
         }).then(res => {
           console.log(res)
@@ -325,7 +332,7 @@ export default {
     async changeUser () {
       console.log('change')
       try {
-        await this.$api.changeUser({
+        await this.$api.adminInfo.changeUser({
           ...this.form
         }).then(res => {
           console.log(res)
@@ -340,7 +347,7 @@ export default {
     async addUser () {
       console.log(this.form)
       try {
-        await this.$api.addUserData({
+        await this.$api.adminInfo.addUserData({
           ...this.form
         }).then(res => {
           console.log(res)
@@ -354,7 +361,7 @@ export default {
     // 删除用户
     async deleteUser () {
       try {
-        await this.$api.deleteUser({
+        await this.$api.adminInfo.deleteUser({
           user_id: this.selectedRow[0].userID
         }).then(res => {
           console.log(res)
@@ -365,11 +372,35 @@ export default {
         this.$message.error('数据获取失败')
       }
     },
+    // 模糊搜索
+    async keyWordSearch (keyWord, inputValue) {
+      try {
+        await this.$api.bookSearch.getInck({
+          [keyWord]: inputValue,
+          pageNum: 1,
+          pageSize: this.pageInfo.pageSize
+        }).then(res => {
+          console.log(res)
+          console.log(res.data)
+          if (res.data === null) {
+            this.pageInfo.total = 0
+            this.tableData = []
+            this.$message.info(res.msg)
+          } else {
+            this.tableData = res.data.list
+            this.pageInfo.total = res.data.total
+            this.$message.success(res.msg)
+          }
+        })
+      } catch {
+        this.$message.error('数据获取失败')
+      }
+    },
     confirmSubmit () {
       console.log('确认提交')
       if (this.formTitle === '修改') {
         this.changeUser()
-      } else if (this.formTitle === '查看详情') {
+      } else if (this.formTitle === '新增') {
         this.addUser()
       }
       this.show_dialog = false
