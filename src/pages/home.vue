@@ -18,8 +18,8 @@
                 <el-menu-item index="/bookSearch">图书查询</el-menu-item>
                 <el-menu-item index="/bookBorrow">图书借阅</el-menu-item>
                 <el-menu-item index="/bookReturn">图书归还</el-menu-item>
-                <el-menu-item index="/bookBRSearch">借阅图书查询</el-menu-item>
-                <el-menu-item index="/test">测试</el-menu-item>
+                <!-- <el-menu-item index="/bookBRSearch">借阅图书查询</el-menu-item> -->
+                <!-- <el-menu-item index="/test">测试</el-menu-item> -->
               </el-menu-item-group>
             </el-submenu>
             <el-submenu index="2">
@@ -39,14 +39,7 @@
                 <el-menu-item index="/bookSearch">图书查询</el-menu-item>
                 <el-menu-item index="/bookBorrow">图书借阅</el-menu-item>
                 <el-menu-item index="/bookReturn">图书归还</el-menu-item>
-                <el-menu-item index="/bookBRSearch">借阅图书查询</el-menu-item>
-              </el-menu-item-group>
-            </el-submenu>
-            <el-submenu index="2">
-              <template slot="title"><i class="el-icon-user-solid"></i>用户管理</template>
-              <el-menu-item-group>
-                <template slot="title">子菜单</template>
-                <el-menu-item index="/adminInfo">用户信息</el-menu-item>
+                <!-- <el-menu-item index="/bookBRSearch">借阅图书查询</el-menu-item> -->
               </el-menu-item-group>
             </el-submenu>
           </el-menu>
@@ -85,7 +78,7 @@ export default {
   methods: {
     loginOut () {
       try {
-        this.$api.logout()
+        this.$api.logout.logout()
         sessionStorage.clear('roleInfo')
         this.$router.push('/')
         this.$message.success('退出成功')

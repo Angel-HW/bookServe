@@ -4,7 +4,8 @@ import qs from 'qs' // 序列化字符串
 // 请求超时时间
 axios.defaults.timeout = 10000
 
-const BaseUrl = 'http://3091m9d958.zicp.vip'
+const BaseUrl = 'http://3091m9d958.zicp.vip' // 靖伦
+// const BaseUrl = 'http://2f991p6776.zicp.vip' // 体委
 
 function headerUrl (url) {
   url = BaseUrl + url

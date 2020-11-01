@@ -4,6 +4,7 @@
       <c-operation
         :tableBtnList="tableBtnList"
         :searchOptions="searchOptions"
+        @keyWordSearch="keyWordSearch"
       >
       </c-operation>
     </div>
@@ -29,7 +30,7 @@
         sortable
       ></el-table-column>
     </c-table>
-    <!--确认借阅弹窗  -->
+    <!--用户信息修改弹窗  -->
     <div class="confirm-dialog" v-show="show_dialog">
       <div class="form-box">
         <div class="title">
@@ -47,7 +48,7 @@
             label="用户账号"
             prop="userAccout"
           >
-            <el-input :disabled="showDetail" v-model="form.userAccout"></el-input>
+            <el-input :disabled="showAccountIput" v-model="form.userAccout"></el-input>
           </el-form-item>
           <el-form-item
             label="用户密码"
@@ -121,6 +122,7 @@ export default {
   data () {
     return {
       noShow: true,
+      showAccountIput: true,
       showDetail: false,
       show_dialog: false,
       tableRefs: 'multipleTable',
@@ -129,22 +131,22 @@ export default {
       selectedRow: [],
       form: {},
       pageInfo: {
-        pageSize: 1,
+        pageSize: 3,
         currentPage: 1,
         total: 0
       },
       searchOptions: [
         {
-          value: '选项1',
-          label: '书籍名称'
+          value: 'bookPress',
+          label: '用户账号'
         },
         {
-          value: '选项2',
-          label: '作者'
+          value: 'bookName',
+          label: '用户名'
         },
         {
-          value: '选项3',
-          label: '出版社'
+          value: 'bookAuthor',
+          label: '角色'
         }
       ],
       tableBtnList: [
@@ -158,6 +160,7 @@ export default {
               this.getUserData()
               this.showDetail = true
               this.show_dialog = true
+              this.showAccountIput = true
             } else if (this.selectedRow.length === 0) {
               this.$message.info('请选择一条数据')
             } else {
@@ -173,6 +176,7 @@ export default {
             this.formTitle = '新增'
             this.show_dialog = true
             this.noShow = false
+            this.showAccountIput = false
           }
         },
         {
@@ -374,8 +378,13 @@ export default {
     },
     // 模糊搜索
     async keyWordSearch (keyWord, inputValue) {
+      if (inputValue === '用户') {
+        inputValue = '2'
+      } else if (inputValue === '管理员') {
+        inputValue = '1'
+      }
       try {
-        await this.$api.bookSearch.getInck({
+        await this.$api.adminInfo.userList({
           [keyWord]: inputValue,
           pageNum: 1,
           pageSize: this.pageInfo.pageSize
@@ -425,6 +434,7 @@ export default {
     closeDialog () {
       this.show_dialog = false
       this.showDetail = false
+      this.noShow = true
       this.$refs.form.resetFields()
     },
     columnFormatter (row, column, cellValue, index) {
@@ -442,6 +452,14 @@ export default {
   },
   mounted () {
     this.getUserList()
+  },
+  watch: {
+    showDetail: {
+      handler: function (val, oldval) {
+        console.log(val.name)
+      },
+      deep: true// 对象内部的属性监听，也叫深度监听
+    }
   }
 }
 </script>

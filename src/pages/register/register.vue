@@ -102,21 +102,28 @@ export default {
     }
   },
   methods: {
-    async registerData () {
-      try {
-        await this.$api.register({
-          ...this.form
-        }).then(res => {
-          if (res.code > 199 && res.code < 300) {
-            this.$message.success(res.msg)
-            this.$router.push('/')
-          } else {
-            this.$message.error(res.msg)
+    registerData () {
+      this.$refs.form.validate(async (valid) => {
+        if (valid) {
+          try {
+            await this.$api.register.register({
+              ...this.form
+            }).then(res => {
+              if (res.code > 199 && res.code < 300) {
+                this.$message.success(res.msg)
+                this.$router.push('/')
+              } else {
+                this.$message.error(res.msg)
+              }
+            })
+          } catch {
+            this.$message.error('获取数据失败')
           }
-        })
-      } catch {
-        this.$message.error('获取数据失败')
-      }
+        } else {
+          // console.log('error submit!!');
+          return false
+        }
+      })
     },
     // 返回登录
     toLogin () {

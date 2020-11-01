@@ -53,6 +53,7 @@ export default {
       const str = new Date().valueOf()
       // console.log(str)
       this.identifyCode = 'http://3091m9d958.zicp.vip/Api/getImage?' + str
+      // this.identifyCode = 'http://2f991p6776.zicp.vip/Api/getImage?' + str
     },
     // 获取验证码
     async getIdenfyCode () {

@@ -49,7 +49,7 @@ export default {
       num: '',
       selectedRow: [],
       pageInfo: {
-        pageSize: 1,
+        pageSize: 3,
         currentPage: 1,
         total: 0
       },
