@@ -38,7 +38,60 @@
       @dialog-before-close="dialogBeforeClose"
       @dialog-cancel="dialogCancel"
       @dialog-confirm="dialogConfirm">
-      <el-form :model="dialogTableData" ref="form" label-width="100px">
+      <c-table
+        class="table-box"
+        :CTableData="dialogTableData"
+        :showOperateBtn="false"
+        :show_pagination="false"
+        >
+        <el-table-column
+          label="书号"
+          prop="isbn"
+          width="100px"
+        >
+        </el-table-column>
+        <el-table-column
+          label="书籍名称"
+          prop="bookName"
+        >
+        </el-table-column>
+        <el-table-column
+          label="书籍作者"
+          prop="bookAuthor"
+        >
+        </el-table-column>
+        <el-table-column
+          label="借阅号"
+          prop="borrowId"
+          width="100px"
+        >
+        </el-table-column>
+        <el-table-column
+          label="借阅人"
+          prop="userName"
+          width="80px"
+        >
+        </el-table-column>
+        <el-table-column
+          label="借阅数量"
+          prop="bookCnt"
+          width="80px"
+        >
+        </el-table-column>
+        <el-table-column
+          label="借阅时间"
+          prop="startTime"
+          width="170px"
+        >
+        </el-table-column>
+        <el-table-column
+          label="归还时间"
+          prop="endTime"
+          width="170px"
+        >
+        </el-table-column>
+      </c-table>
+      <!-- <el-form :model="dialogTableData" ref="form" label-width="100px">
         <el-row>
           <el-col :span="12" >
             <el-form-item  label="图书编号" prop="isbn">
@@ -72,7 +125,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="借阅数量" prop="bookCnt ">
-              <el-input v-model="dialogTableData.bookCnt "></el-input>
+              <el-input :disabled="true" v-model="dialogTableData.bookCnt "></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -86,7 +139,7 @@
             </el-form-item>
           </el-col>
         </el-row>
-      </el-form>
+      </el-form> -->
     </c-dialog>
   </div>
 </template>
@@ -143,21 +196,10 @@ export default {
           func: () => {
             console.log('借阅')
             console.log(this.dialogTableData)
-            if ('isbn' in this.dialogTableData) {
+            if (this.dialogTableData.length !== 0) {
               this.dialogVisible = true
             } else {
               this.$message.info('请选择需要归还的图书')
-              // const myDate = new Date()
-              // const years = myDate.getFullYear()
-              // const month = myDate.getMonth() + 1
-              // const day = myDate.getDate()
-              // this.dialogTableData = this.dialogTableData.map(item => {
-              //   item.startDate = `${years}-${month}-${day}`
-              //   item.endDate = `${years}-${month + 1}-${day}`
-              //   return item
-              // })
-              // console.log(this.dialogTableData)
-              // console.log(myDate)
             }
           }
         }
@@ -166,7 +208,7 @@ export default {
         {
           prop: 'isbn',
           label: '书号',
-          width: '100px'
+          width: '150px'
         },
         {
           prop: 'bookName',
@@ -180,26 +222,26 @@ export default {
         },
         {
           prop: 'borrowId',
-          label: '借阅编号'
+          label: '借阅编号',
+          width: '140px'
         },
         {
           prop: 'userId',
           label: '借阅人编号',
-          width: '150px'
+          width: '250px'
         },
         {
           prop: 'userName',
-          label: '借阅人名称'
+          label: '借阅人名称',
+          width: '130px'
         },
         {
           prop: 'startTime',
-          label: '借阅时间',
-          width: '200px'
+          label: '借阅时间'
         },
         {
           prop: 'endTime',
-          label: '归还时间',
-          width: '200px'
+          label: '归还时间'
         }
       ],
       tableData: [
@@ -266,11 +308,14 @@ export default {
       }
     },
     async confirmSubmit () {
+      const bookCnts = this.dialogTableData.map(item => item.bookCnt).toString()
+      const isbns = this.dialogTableData.map(item => item.isbn).toString()
+      const borrowIds = this.dialogTableData.map(item => item.borrowId).toString()
       try {
         await this.$api.bookReturn.getBookInfo({
-          bookCnt: this.dialogTableData.bookCnt,
-          isbn: this.dialogTableData.isbn,
-          borrowId: this.dialogTableData.borrowId
+          bookCnt: bookCnts,
+          isbn: isbns,
+          borrowId: borrowIds
         }).then(res => {
           console.log(res.data)
           this.$message.success(res.msg)
@@ -310,7 +355,7 @@ export default {
     handleSelectionChange (row) {
       console.log(row)
       if (row.length !== 0) {
-        this.dialogTableData = row[0]
+        this.dialogTableData = row
       }
     },
     sizeChange (pageSize) {
@@ -325,12 +370,12 @@ export default {
     // 关闭弹窗
     dialogCancel () {
       this.dialogVisible = false
-      this.$refs.form.resetFields()
+      // this.$refs.form.resetFields()
       // this.$refs.upload.clearFiles()
     },
     dialogBeforeClose () {
       this.dialogVisible = false
-      this.$refs.form.resetFields()
+      // this.$refs.form.resetFields()
     },
     dialogConfirm () {
       this.confirmSubmit()

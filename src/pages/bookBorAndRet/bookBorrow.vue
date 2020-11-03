@@ -9,12 +9,12 @@
       </c-operation>
     </div>
     <c-table
-      :ref="tableRefs"
+      ref="CtableRefs"
       :showSelection="true"
       :showTableOperateBtn="false"
       :CTableData="tableData"
       :pageInfo="pageInfo"
-       @sizeChange="sizeChange"
+      @sizeChange="sizeChange"
       @handleCurrentChange="handleCurrentChange"
       @selection-change="handleSelectionChange"
     >
@@ -35,55 +35,77 @@
       @dialog-before-close="dialogBeforeClose"
       @dialog-cancel="dialogCancel"
       @dialog-confirm="dialogConfirm">
-      <el-form :model="dialogTableData" ref="dialogTableData" label-width="100px">
-        <el-row>
-          <el-col :span="12" >
-            <el-form-item  label="书号" prop="isBn">
-              <el-input :disabled="true" v-model="dialogTableData.isBn"></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-              <el-form-item label="书籍名称" prop="bookName">
-                <el-input :disabled="true" v-model="dialogTableData.bookName"></el-input>
-              </el-form-item>
-          </el-col>
-            <el-col :span="12">
-              <el-form-item label="书籍作者" prop="bookAuthor">
-                <el-input :disabled="true" v-model.number="dialogTableData.bookAuthor"></el-input>
-              </el-form-item>
-            </el-col>
-          <el-col :span="12">
-            <el-form-item label="书籍出版社" prop="bookPress">
-              <el-input :disabled="true" v-model="dialogTableData.bookPress"></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="内容简介" prop="detail">
-              <el-input :disabled="true" v-model="dialogTableData.detail"></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="存放地点" prop="bookPlace">
-              <el-input :disabled="true" v-model="dialogTableData.bookPlace"></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="借阅数量" prop="bookCnt ">
-              <el-input v-model="dialogTableData.bookCnt "></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="借阅时间" prop="startDate">
-              <el-input :disabled="true" v-model="dialogTableData.startDate"></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="归还时间" prop="endDate">
-              <el-input :disabled="true" v-model="dialogTableData.endDate"></el-input>
-            </el-form-item>
-          </el-col>
-        </el-row>
-      </el-form>
+      <c-table
+        class="table-box"
+        :CTableData="dialogTableData"
+        :showOperateBtn="false"
+        :show_pagination="false"
+        >
+        <el-table-column
+          label="操作"
+        >
+          <template slot-scope="scope">
+            <el-button type="danger" icon="el-icon-delete" circle @click="dialogDeleteData(scope.$index)"></el-button>
+          </template>
+        </el-table-column>
+        <el-table-column
+          label="书号"
+          prop="isBn"
+          width="100px"
+        >
+        </el-table-column>
+        <el-table-column
+          label="书籍名称"
+          prop="bookName"
+        >
+        </el-table-column>
+        <el-table-column
+          label="书籍作者"
+          prop="bookAuthor"
+        >
+        </el-table-column>
+        <el-table-column
+          label="书籍出版社"
+          prop="bookPress"
+          width="130px"
+        >
+        </el-table-column>
+        <el-table-column
+          label="内容简介"
+          prop="detail"
+          width="150px"
+          :show-overflow-tooltip="true"
+        >
+        </el-table-column>
+        <el-table-column
+          label="存放地点"
+          prop="bookPlace"
+          width="150px"
+          :show-overflow-tooltip="true"
+        >
+        </el-table-column>
+        <el-table-column
+          label="借阅数量"
+          prop="bookCnt"
+          width="100px"
+        >
+          <template slot-scope="scope">
+            <el-input type="number" min="0" :max="scope.row.num" v-model="scope.row.bookCnt"></el-input>
+          </template>
+        </el-table-column>
+        <el-table-column
+          label="借阅时间"
+          prop="startDate"
+          width="110px"
+        >
+        </el-table-column>
+        <el-table-column
+          label="归还时间"
+          prop="endDate"
+          width="110px"
+        >
+        </el-table-column>
+      </c-table>
     </c-dialog>
   </div>
 </template>
@@ -107,7 +129,6 @@ export default {
       show_dialog: false,
       dialogVisible: false,
       dialogTitle: '是否借阅以下书籍',
-      tableRefs: 'multipleTable',
       num: '',
       pageInfo: {
         pageSize: 3,
@@ -135,22 +156,18 @@ export default {
           ope_name: '借阅',
           func: () => {
             console.log('借阅')
-            console.log(this.dialogTableData)
-            if ('id' in this.dialogTableData) {
+            console.log(this.dialogTableData.length)
+            if (this.dialogTableData.length > 0) {
               const myDate = new Date()
               const years = myDate.getFullYear()
               const month = myDate.getMonth() + 1
               const day = myDate.getDate()
-              this.dialogTableData.startDate = `${years}-${month}-${day}`
-              this.dialogTableData.endDate = `${years}-${month + 1}-${day}`
-              // this.dialogTableData = this.dialogTableData.map(item => {
-              //   item.startDate = `${years}-${month}-${day}`
-              //   item.endDate = `${years}-${month + 1}-${day}`
-              //   return item
-              // })
-              // console.log(this.dialogTableData)
-              // console.log(myDate)
+              this.dialogTableData.map(item => {
+                item.startDate = `${years}-${month}-${day}`
+                item.endDate = `${years}-${month + 1}-${day}`
+              })
               this.dialogVisible = true
+              console.log(this.dialogTableData)
             } else {
               this.$message.info('请选择需要借阅的图书')
             }
@@ -278,22 +295,28 @@ export default {
         this.$message.error('数据获取失败')
       }
     },
+    // 图书借阅
     async confirmSubmit () {
       console.log('确认提交')
+      const bookCnts = this.dialogTableData.map(item => item.bookCnt).toString()
+      const isbns = this.dialogTableData.map(item => item.isBn).toString()
       try {
         await this.$api.bookBorrow.getBookInfo({
-          bookCnt: this.dialogTableData.bookCnt,
-          isbn: this.dialogTableData.isBn
+          bookCnt: bookCnts,
+          isbn: isbns
         }).then(res => {
           console.log(res)
           if (res.code === 10000) {
             this.$message.error('最多只能借3本')
+            this.dialogTableData = []
+            this.$refs.CtableRefs.$refs.elTablerefs.clearSelection()
           } else {
             this.$message.success(res.msg)
             this.reload()
           }
         })
       } catch {
+        this.$refs.CtableRefs.$refs.elTablerefs.clearSelection()
         this.$message.error('数据获取失败')
       }
     },
@@ -301,7 +324,7 @@ export default {
     handleSelectionChange (row) {
       console.log(row)
       if (row.length !== 0) {
-        this.dialogTableData = row[0]
+        this.dialogTableData = row
       }
     },
     sizeChange (pageSize) {
@@ -313,20 +336,30 @@ export default {
       this.pageInfo.currentPage = pageNum
       this.getInckBook()
     },
-
+    dialogDeleteData (value) {
+      console.log(value)
+      this.dialogTableData.splice(value, 1)
+    },
     // 关闭弹窗
     dialogCancel () {
       this.dialogVisible = false
-      this.$refs.form.resetFields()
+      this.dialogTableData = []
+      this.$refs.CtableRefs.$refs.elTablerefs.clearSelection()
+      // this.$refs.tableRefs.clearSelection()
+      // this.$refs.form.resetFields()
       // this.$refs.upload.clearFiles()
     },
     dialogBeforeClose () {
       this.dialogVisible = false
-      this.$refs.form.resetFields()
+      this.dialogTableData = []
+      this.$refs.CtableRefs.$refs.elTablerefs.clearSelection()
+      // this.$refs.tableRefs.clearSelection()
+      // this.$refs.form.resetFields()
     },
-    dialogConfirm () {
+    dialogConfirm (rows) {
       this.confirmSubmit()
       this.dialogVisible = false
+      this.dialogTableData = []
       // this.$refs.form.resetFields()
     },
     closeDialog () {

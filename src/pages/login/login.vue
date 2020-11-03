@@ -8,23 +8,20 @@
           <el-input v-model="form.name"></el-input>
         </el-form-item>
         <el-form-item label="密码">
-          <el-input v-model="form.password"></el-input>
+          <el-input type="password" v-model="form.password"></el-input>
         </el-form-item>
-        <el-form-item label="验证码">
+        <!-- <el-form-item label="验证码">
           <el-input v-model="form.code"></el-input>
-          <!-- <img :src="identifyCode" alt="验证码图片" @click="getIdenfyCode()"> -->
-        </el-form-item>
-        <el-form-item class="identifyCode">
+        </el-form-item> -->
+        <!-- <el-form-item class="identifyCode">
           <el-image :src="identifyCode" @click="updateIdenfyCode()"></el-image>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item>
           <el-button type="primary" @click="login">登录</el-button>
         </el-form-item>
         <el-form-item>
-          <!-- <el-checkbox v-model="checked">记住密码</el-checkbox> -->
           <span class="opra">
             <router-link class="router-link" to="/register">注册</router-link>
-            <!-- <router-link class="router-link" to="/losePassword">忘记密码？</router-link> -->
           </span>
         </el-form-item>
       </el-form>
@@ -133,7 +130,7 @@ export default {
         margin: 10px auto;
         width: 80%;
         .el-form-item__label {
-          width: 62px;
+          width: 20%;
         }
         .el-input {
           width: 80%;

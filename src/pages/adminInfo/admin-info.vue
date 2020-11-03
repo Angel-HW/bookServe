@@ -36,7 +36,7 @@
         <div class="title">
           <h3>{{ this.formTitle }}</h3>
         </div>
-        <el-form :model="form" ref="form">
+        <el-form :model="form" ref="form" :rules="rules">
           <el-form-item
             label="用户ID"
             prop="userID"
@@ -79,7 +79,7 @@
             label="手机号"
             prop="userPhone"
           >
-            <el-input :disabled="showDetail" v-model="form.userPhone"></el-input>
+            <el-input type="number" :disabled="showDetail" v-model="form.userPhone"></el-input>
           </el-form-item>
           <el-form-item
             label="角色"
@@ -300,7 +300,24 @@ export default {
         // { id: 1, name: 'pgjaijg', startdate: '2020-04-05', enddate: '2020-05-05' },
         // { id: 1, name: 'pgjaijg', startdate: '2020-04-05', enddate: '2020-05-05' },
         // { id: 1, name: 'pgjaijg', startdate: '2020-04-05', enddate: '2020-05-05' }
-      ]
+      ],
+      rules: {
+        userName: [
+          { required: true, message: '请输入用户名', trigger: 'blur' },
+          { min: 3, message: '不少于3个字符', trigger: 'blur' }
+        ],
+        userSex: [
+          { required: true, message: '请至少选择一个', trigger: 'change' }
+        ],
+        userPassWord: [
+          { required: true, message: '请输入密码', trigger: 'blur' },
+          { min: 6, message: '不少于6个字符', trigger: 'blur' }
+        ],
+        userPhone: [
+          { required: true, message: '请输入手机号', trigger: 'change' },
+          { type: 'number', min: 11, max: 11, message: '请输入正确的11位手机号', trigger: 'blur' }
+        ]
+      }
     }
   },
   methods: {
@@ -333,19 +350,26 @@ export default {
       }
     },
     // 修改用户信息
-    async changeUser () {
+    changeUser () {
       console.log('change')
-      try {
-        await this.$api.adminInfo.changeUser({
-          ...this.form
-        }).then(res => {
-          console.log(res)
-          // this.form = res.data
-          this.$message.success(res.msg)
-        })
-      } catch {
-        this.$message.error('数据获取失败')
-      }
+      this.$refs.form.validate(async (valid) => {
+        if (valid) {
+          try {
+            await this.$api.adminInfo.changeUser({
+              ...this.form
+            }).then(res => {
+              console.log(res)
+              this.$message.success(res.msg)
+              this.show_dialog = false
+              this.reload()
+            })
+          } catch {
+            this.$message.error('数据获取失败')
+          }
+        } else {
+          return false
+        }
+      })
     },
     // 新增用户
     async addUser () {
@@ -357,6 +381,8 @@ export default {
           console.log(res)
           // this.form = res.data
           this.$message.success(res.msg)
+          this.show_dialog = false
+          this.reload()
         })
       } catch {
         this.$message.error('数据获取失败')
@@ -412,8 +438,6 @@ export default {
       } else if (this.formTitle === '新增') {
         this.addUser()
       }
-      this.show_dialog = false
-      this.reload()
     },
     sizeChange (pageSize) {
       this.pageInfo.pageSize = pageSize

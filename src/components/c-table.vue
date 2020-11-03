@@ -1,7 +1,7 @@
 <template>
   <div id="c-table">
     <el-table
-      :ref="refs"
+      ref="elTablerefs"
       :data="CTableData"
       @selection-change="handleSelectionChange"
     >
@@ -39,12 +39,6 @@
 export default {
   name: 'CTable',
   props: {
-    refs: {
-      type: String,
-      default: () => {
-        return ''
-      }
-    },
     pageInfo: {
       type: Object,
       default: () => {
